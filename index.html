@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Trabajo Semestral - ML</title>
+  <link rel="stylesheet" href="estilos.css">
+</head>
+
+<body>
+
+  <nav class="sidebar">
+    <ul>
+      <li><a href="#portada">Portada</a></li>
+      <li><a href="#arboles">Árboles de Decisión</a></li>
+      <li><a href="#rl">Reinforcement Learning</a></li>
+      <li><a href="#comparativa">Comparativa</a></li>
+    </ul>
+  </nav>
+
+  <div class="contenido">
+
+    <section id="portada" class="portada">
+      <img src="ufro.png" alt="Logo UFRO" class="logo">
+      <h1>2025 Trabajo Semestral - Machine Learning</h1>
+      <h2>Autor: Jose Francisco Saldias</h2>
+
+      <div class="introduccion">
+        <h3>Introducción:</h3>
+        <p>
+          El machine learning es una rama de la inteligencia artificial (IA) centrada en entrenar a computadoras y máquinas para imitar el modo en que aprenden los humanos, realizar tareas de forma autónoma y mejorar su rendimiento y precisión a través de la experiencia y la exposición a más datos.
+        </p>
+        <p>
+          En este sitio se pretende explicar de forma simple dos conceptos utilizados en el ML, además de evaluar sus ventajas y limitaciones.
+        </p>
+      </div>
+    </section>
+
+    <section id="arboles">
+        <h2>Árboles de Decisión</h2>
+      
+        <p>
+          "Un árbol de decisión es un algoritmo de aprendizaje supervisado no paramétrico, que se utiliza tanto para tareas de clasificación como de regresión. Tiene una estructura jerárquica de árbol, que consta de un nodo raíz, ramas, nodos internos y nodos hoja."[1]
+        </p>
+      
+        <p>
+          Esta definición puede dar la impresión de que los árboles de decisión son un concepto complejo, pero en realidad pueden ser tan simples como el siguiente ejemplo:
+        </p>
+      
+        <img src="arbol1.png" alt="Árbol simple de decisión" class="imagen-arbol">
+      
+        <p>
+          Como vemos, la función de un árbol de decisión es plantear una afirmación y luego tomar una decisión basada en si dicha afirmación es verdadera o falsa. Cuando un árbol de decisión clasifica elementos en categorías, se llama <strong>árbol de clasificación</strong>, y cuando predice valores numéricos, se denomina <strong>árbol de regresión</strong>. En esta explicación nos centraremos en los árboles de clasificación.
+        </p>
+      
+        <p>
+          A continuación, se muestra un ejemplo más complejo:
+        </p>
+      
+        <img src="arbol2.png" alt="Árbol de clasificación más complejo" class="imagen-arbol">
+      
+        <p>
+          Como se puede observar, dentro del árbol se puede combinar información numérica, como un rango de edad, con información binaria, como la presencia o ausencia de problemas de visión. También es importante notar que las clasificaciones, como "puede conducir", pueden repetirse.
+        </p>
+      
+        <p>
+          Por convención, las decisiones <strong>verdaderas</strong> suelen colocarse a la derecha y las <strong>falsas</strong> a la izquierda. Para recorrer un árbol, se comienza desde la parte superior (nodo raíz) y se avanza hacia abajo siguiendo los nodos, lo que en computación se realiza mediante un <em>algoritmo de búsqueda</em> (por ejemplo, <strong>greedy search</strong>).
+        </p>
+      
+        <p>
+          Los diferentes nodos del árbol se clasifican así:
+          <ul>
+            <li><strong>Nodo raíz</strong>: el que se encuentra en la parte superior; solo tiene conexiones salientes.</li>
+            <li><strong>Nodos internos</strong> (o <em>ramas</em>): tienen tanto conexiones entrantes como salientes.</li>
+            <li><strong>Hojas</strong>: están al final del árbol y solo tienen conexiones entrantes.</li>
+          </ul>
+        </p>
+      
+        <p>
+          Ahora que conocemos la estructura y la función de un árbol, podemos preguntarnos: <strong>¿cómo se construye uno a partir de datos?</strong> Por ejemplo, observemos la siguiente tabla:
+        </p>
+      
+        <table class="tabla-datos">
+            <thead>
+              <tr>
+                <th>Le gusta el helado</th>
+                <th>Le gusta pasear</th>
+                <th>Edad</th>
+                <th>Le gusta el verano</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr><td>Sí</td><td>Sí</td><td>7</td><td>No</td></tr>
+              <tr><td>Sí</td><td>No</td><td>12</td><td>No</td></tr>
+              <tr><td>No</td><td>Sí</td><td>18</td><td>Sí</td></tr>
+              <tr><td>No</td><td>Sí</td><td>35</td><td>Sí</td></tr>
+              <tr><td>Sí</td><td>Sí</td><td>38</td><td>Sí</td></tr>
+              <tr><td>Sí</td><td>No</td><td>50</td><td>No</td></tr>
+              <tr><td>No</td><td>No</td><td>83</td><td>No</td></tr>
+            </tbody>
+          </table>
+          
+      
+        <p>
+El primer paso para construir un árbol de decisión es elegir cuál será la afirmación que colocaremos como <strong>nodo raíz</strong>. Para ello, evaluaremos tres posibles afirmaciones extraídas de los datos: <em>"le gusta el helado"</em>, <em>"le gusta pasear"</em> y <em>"edad"</em>. Empezaremos probando qué tan bien predice la afirmación <strong>"le gusta el helado"</strong> respecto a la decisión que queremos predecir: <strong>"le gusta el verano"</strong>.
+</p>
+
+<img src="arbol3.png" alt="Árbol con 'le gusta el helado' como raíz" class="imagen-arbol">
+
+<p>
+Como se puede observar, las <strong>hojas</strong> del árbol contienen una mezcla de respuestas "sí" y "no", lo que significa que esta afirmación no predice perfectamente la variable objetivo. A esta mezcla se le llama <strong>impureza</strong>. Por lo tanto, una forma lógica de elegir la mejor afirmación para el nodo raíz es comparando qué tan puras son las divisiones que produce cada una.
+</p>
+
+<p>
+Existen varias formas de medir esta impureza: <strong>Gini impurity</strong>, <strong>entropía</strong> y <strong>ganancia de información</strong>. En este caso utilizaremos <strong>Gini impurity</strong> por ser una métrica popular y más sencilla de explicar.
+</p>
+
+<h3>Cálculo de Gini Impurity</h3>
+
+<p>
+La fórmula para calcular la impureza Gini en una hoja es la siguiente:
+</p>
+
+<pre><code>
+Gini de una hoja = 1 - (p_sí)² - (p_no)²
+</code></pre>
+
+<p>
+Para la <strong>hoja izquierda</strong> del árbol anterior (1 "sí" y 3 "no"):
+</p>
+
+<pre><code>
+Gini = 1 - (1/4)² - (3/4)² = 1 - 0.0625 - 0.5625 = 0.375
+</code></pre>
+
+<p>
+Para la <strong>hoja derecha</strong> (2 "sí" y 1 "no"):
+</p>
+
+<pre><code>
+Gini = 1 - (2/3)² - (1/3)² ≈ 1 - 0.444 - 0.111 ≈ 0.444
+</code></pre>
+
+<p>
+Como las hojas no tienen el mismo número de datos, calculamos la impureza total como un <strong>promedio ponderado</strong>:
+</p>
+
+<pre><code>
+Gini total = (4/7) * 0.375 + (3/7) * 0.444 ≈ 0.405
+</code></pre>
+
+<h3>Comparación con otras afirmaciones</h3>
+
+<p>
+Podemos repetir este proceso con las otras afirmaciones. En el caso de la edad, debemos dividir los valores numéricos en rangos (por ejemplo, "edad &lt; 15") y calcular la impureza Gini para cada posible división, eligiendo la que produzca el árbol más puro.
+</p>
+
+<p>
+Tras calcular las impurezas Gini para las tres afirmaciones, obtenemos:
+</p>
+
+<ul>
+  <li><strong>Le gusta el helado</strong>: 0.405</li>
+  <li><strong>Le gusta pasear</strong>: 0.214</li>
+  <li><strong>Edad &lt; 15</strong>: 0.343</li>
+</ul>
+
+<p>
+Como <strong>"le gusta pasear"</strong> tiene la menor impureza, la elegimos como raíz del árbol:
+</p>
+
+<img src="arbol4.png" alt="Árbol con 'le gusta pasear' como raíz" class="imagen-arbol">
+
+<h3>Refinando el árbol</h3>
+
+<p>
+Notamos que en la hoja izquierda del árbol aún hay una mezcla (3 "sí" y 1 "no"). Para mejorar la precisión, intentamos <strong>subdividir ese grupo</strong> utilizando alguna de las afirmaciones descartadas. En este caso, la mejor opción resulta ser la edad:
+</p>
+
+<img src="arbol5.png" alt="Árbol con nodo edad agregado" class="imagen-arbol">
+
+<p>
+Ahora todas las hojas contienen decisiones puras (sin mezcla de sí y no), por lo que no es necesario seguir dividiendo. Solo queda <strong>asignar una categoría de salida</strong> a cada hoja según la mayoría de casos en ella:
+</p>
+
+<img src="arbol6.png" alt="Árbol final con clasificaciones" class="imagen-arbol">
+
+<p>
+¡Con eso terminamos la construcción del árbol de decisión!
+
+  <hr>
+<h3>A Continuacion puedes probar el árbol de decisión creado</h3>
+<p>Completa los siguientes campos y observa cómo el árbol toma una decisión.</p>
+
+<section id="simulador">
+  <label>¿Te gusta pasear?</label><br>
+  <select id="pasear">
+    <option value="si">Sí</option>
+    <option value="no">No</option>
+  </select><br><br>
+  
+  <label>¿Cuál es tu edad?</label><br>
+  <input type="number" id="edad" min="1" max="120"><br><br>
+  
+  <button onclick="clasificar()">Clasificar</button>
+  
+  <p id="resultado" style="font-weight:bold; margin-top:15px;"></p>
+</section>
+
+<script>
+  //este es el codigo enbevido que se solicito, en este caso JavaScript
+  // Función que clasifica según árbol de decisión
+  function clasificar() {
+    const pasear = document.getElementById("pasear").value; // obtiene si le gusta pasear
+    const edad = parseInt(document.getElementById("edad").value); // edad ingresada
+    let resultado = "";
+
+    // Árbol de decisión simple
+    if (pasear === "si") {
+      if (edad < 20) {
+        resultado = "No le gusta el verano";
+      } else {
+        resultado = "Sí le gusta el verano";
+      }
+    } else {
+      resultado = "No le gusta el verano";
+    }
+
+    // Muestra el resultado en la página
+    document.getElementById("resultado").textContent = resultado;
+  }
+</script>
+
+
+</p>
+
+      </section>
+      
+
+        <section id="rl">
+      <h2>Reinforcement Learning</h2>
+      
+      <p>
+        El aprendizaje por refuerzo (RL) es un tipo de proceso de machine learning que se centra en la toma de decisiones por parte de agentes autónomos. Un agente autónomo es cualquier sistema que puede tomar decisiones y actuar en respuesta a su entorno independientemente de las instrucciones directas de un usuario humano. Los robots y los coches autónomos son ejemplos de agentes autónomos. En el aprendizaje por refuerzo, un agente autónomo aprende a realizar una tarea por ensayo y error en ausencia de cualquier orientación por parte de un usuario humano. Aborda especialmente los problemas de toma de decisiones secuenciales en entornos inciertos, y se muestra prometedor en el desarrollo de la inteligencia artificial.[2]
+      </p>
+      
+      <h3>Ejemplo Práctico</h3>
+      
+      <p>
+        Para explicar el concepto de Reinforcement Learning podemos usar un ejemplo práctico: imagina que quieres comer una hamburguesa y tienes que decidir entre Krusty Burger y Hamburguesas Bob. Nunca has ido a ninguno de estos locales, ¿cómo decides cuál elegir? ¿Cómo sabemos cuál servirá una mejor hamburguesa?
+      </p>
+      
+      <img src="burguer.png" alt="Opciones de hamburguesas" class="imagen-ejemplo">
+      
+      <p>
+        Son problemas como estos los que resuelve RL. Es una metodología que permite a los computadores aprender y adaptarse basándose en la experiencia, y ha sido usada en muchas situaciones como enseñarle a los computadores a jugar ajedrez y Go o para enseñar a los autos que se conducen solos.
+      </p>
+      
+      <h3>Proceso de Decisión</h3>
+      
+      <p>
+        Volviendo al ejemplo de las hamburguesas, ya que nunca hemos ido a ninguno de los locales, podemos decir que cada uno tiene la misma probabilidad de ser elegido (0.5). Podemos visualizar esto como una línea donde cada opción ocupa un espacio proporcional a su probabilidad:
+      </p>
+      
+      <div class="probabilidad-linea">
+        <div class="opcion" style="width:50%">Krusty (0.5)</div>
+        <div class="opcion" style="width:50%">Bob's (0.5)</div>
+      </div>
+      
+      <p>
+        Para decidir a qué local ir, elegimos un número al azar entre 0 y 1. Si obtenemos 0.7:
+      </p>
+      
+      <div class="probabilidad-linea">
+        <div class="opcion" style="width:50%">Krusty (0.5)</div>
+        <div class="opcion seleccionada" style="width:50%">Bob's (0.5) ← 0.7 cae aquí</div>
+      </div>
+      
+      <p>
+        Como 0.7 se ubica en la región que representa Bob's Burgers, decidimos ir a ese local. Al comer aquí nos sirven una gran hamburguesa y quedamos muy satisfechos. Sin embargo, solo hemos estado en este local una sola vez, por lo tanto aún no tenemos confianza de que quedemos satisfechos cada vez que visitemos. Es probable que si vamos a Krusty Burger también recibamos el mismo servicio, así que aún nos gustaría ir a probar.
+      </p>
+      
+      <img src="burguer2.png" alt="Hamburguesa satisfactoria" class="imagen-ejemplo">
+      
+      <h3>Actualizando Probabilidades</h3>
+      
+      <p>
+        Como quedamos satisfechos con nuestra visita a Bob's Burgers, tiene sentido que incremente la probabilidad de que lo volvamos a elegir. Para determinar cuánto incrementa esta probabilidad, valoramos qué tanto nos gustó la hamburguesa en una escala de 0 a 1 (le pondremos 1) y usamos la siguiente ecuación:
+      </p>
+      
+      <pre><code>nueva p(Bob) = p(Bob) + [Tasa de aprendizaje * (puntaje - p(Bob)]</code></pre>
+      
+      <p>Donde <em>p(x)</em> = probabilidad de x</p>
+      
+      <p>
+        Esta ecuación calcula la nueva probabilidad usando la probabilidad actual, el puntaje e introduce un nuevo concepto: la <strong>tasa de aprendizaje</strong>. Este número controla qué tan pequeño o grande queremos que sea el cambio en las probabilidades cada vez que las actualicemos. La tasa de aprendizaje toma valores entre 0 y 1:
+      </p>
+      
+      <ul>
+        <li>Si es 0: la probabilidad no cambia</li>
+        <li>Si es 1: la probabilidad cambia completamente al nuevo valor</li>
+      </ul>
+      
+      <p>
+        En nuestro caso, usaremos una tasa de aprendizaje de 0.1:
+      </p>
+      
+      <pre><code>nueva p(Bob) = 0.5 + [0.1 * (1 - 0.5)] = 0.55</code></pre>
+      
+      <p>
+        Ahora nuestra probabilidad de elegir Bob's Burguer aumentó a 0.55, lo que significa que la probabilidad de elegir Krusty Burguer cambió a:
+      </p>
+      
+      <pre><code>nueva p(Krusty) = 1 - nueva p(Bob) = 0.45</code></pre>
+      
+      <div class="probabilidad-linea">
+        <div class="opcion" style="width:45%">Krusty (0.45)</div>
+        <div class="opcion" style="width:55%">Bob's (0.55)</div>
+      </div>
+      
+      <p>
+        El incremento es pequeño porque, aunque quedamos satisfechos, solo hemos ido una vez y es posible que no siempre se repita la misma experiencia.
+      </p>
+      
+      <h3>Segunda Experiencia</h3>
+      
+      <p>
+        Más tarde queremos hamburguesa nuevamente. Elegimos un número al azar (0.2) que cae en la región de Krusty Burger:
+      </p>
+      
+      <div class="probabilidad-linea">
+        <div class="opcion seleccionada" style="width:45%">Krusty (0.45) ← 0.2 cae aquí</div>
+        <div class="opcion" style="width:55%">Bob's (0.55)</div>
+      </div>
+      
+      <p>
+        Al ordenar en Krusty nos dan una hamburguesa muy pequeña y quedamos insatisfechos (puntaje: 0). Actualizamos las probabilidades:
+      </p>
+      
+      <pre><code>nueva p(Krusty) = 0.45 + [0.1 * (0 - 0.45)] = 0.41
+nueva p(Bob) = 1 - 0.41 = 0.59</code></pre>
+      
+      <div class="probabilidad-linea">
+        <div class="opcion" style="width:41%">Krusty (0.41)</div>
+        <div class="opcion" style="width:59%">Bob's (0.59)</div>
+      </div>
+      
+      <h3>Convergencia</h3>
+      
+      <p>
+        Si repetimos este proceso muchas veces, eventualmente las probabilidades se estabilizarán (por ejemplo, 0.19 para Krusty y 0.81 para Bob's). Cuando las probabilidades dejan de cambiar significativamente, decimos que el algoritmo ha <strong>convergido</strong>, lo que significa que hemos aprendido cuál es la mejor opción basándonos en nuestras experiencias.
+      </p>
+      
+      <h3>Definiciones Clave</h3>
+      
+      <p>
+        Ahora que entendemos cómo funciona Reinforcement Learning, podemos definir algunos términos técnicos:
+      </p>
+      
+      <ul>
+        <li><strong>Entorno:</strong> Es el contexto con el que interactúa el agente. En nuestro ejemplo, serían ambos locales de comida.</li>
+        <li><strong>Agente:</strong> La entidad que toma decisiones. En este caso, fuimos nosotros.</li>
+        <li><strong>Política (Policy):</strong> Estrategia que usa el agente para tomar decisiones (en nuestro caso, las probabilidades de elección).</li>
+        <li><strong>Recompensa:</strong> Retroalimentación numérica que recibe el agente después de cada acción. En nuestro ejemplo fue el puntaje (0-1) que dimos a cada hamburguesa.</li>
+        <li><strong>Tasa de aprendizaje:</strong> Controla cuánto afecta cada nueva experiencia a las probabilidades futuras.</li>
+      </ul>
+
+      <section id="bandido-interactivo">
+  <h3>Simulador Interactivo: Bandido Multi-brazo</h3>
+  
+  <div class="simulador-container">
+    <div class="maquina-tragaperras">
+      <div class="brazo" id="brazo1">
+        <div class="palanca">↘️</div>
+        <div class="recompensa-promedio">Recompensa: ?</div>
+      </div>
+      <div class="brazo" id="brazo2">
+        <div class="palanca">↘️</div>
+        <div class="recompensa-promedio">Recompensa: ?</div>
+      </div>
+      <div class="brazo" id="brazo3">
+        <div class="palanca">↘️</div>
+        <div class="recompensa-promedio">Recompensa: ?</div>
+      </div>
+    </div>
+    
+    <div class="controles">
+      <div class="parametros">
+        <label>Tasa de aprendizaje (α): 
+          <input type="range" id="tasa-aprendizaje" min="0" max="1" step="0.1" value="0.1">
+          <span id="valor-tasa">0.1</span>
+        </label>
+        
+        <label>Factor de exploración (ε): 
+          <input type="range" id="exploracion" min="0" max="1" step="0.1" value="0.2">
+          <span id="valor-exploracion">0.2</span>
+        </label>
+      </div>
+      
+      <button id="jugar">Jugar 10 veces</button>
+      <button id="reiniciar">Reiniciar</button>
+    </div>
+    
+    <div class="resultados">
+      <h4>Estadísticas:</h4>
+      <p>Total de jugadas: <span id="total-jugadas">0</span></p>
+      <p>Recompensa acumulada: <span id="recompensa-total">0</span></p>
+      <p>Brazo preferido: <span id="brazo-preferido">Ninguno</span></p>
+    </div>
+  </div>
+  
+  <div class="explicacion">
+    <p><strong>¿Cómo funciona?</strong> Cada brazo da recompensas diferentes (normalmente entre 0 y 1). 
+    El algoritmo debe aprender cuál es el mejor brazo explorando (probando al azar) y explotando (usando lo aprendido). 
+    Puedes ajustar los parámetros para ver cómo afectan al aprendizaje.</p>
+  </div>
+</section>
+
+<script>
+  // Configuración inicial
+  const brazos = [
+    { media: 0.3, varianza: 0.1 }, // Brazo malo
+    { media: 0.6, varianza: 0.1 }, // Brazo decente
+    { media: 0.8, varianza: 0.05 }  // Brazo bueno
+  ];
+  
+  let qValues = [0, 0, 0];  // Valores estimados para cada brazo
+  let counts = [0, 0, 0];   // Veces que se ha jugado cada brazo
+  let totalJugadas = 0;
+  let recompensaTotal = 0;
+  
+  // Elementos del DOM
+  const elementosBrazos = document.querySelectorAll('.brazo');
+  const botonJugar = document.getElementById('jugar');
+  const botonReiniciar = document.getElementById('reiniciar');
+  const tasaAprendizajeInput = document.getElementById('tasa-aprendizaje');
+  const exploracionInput = document.getElementById('exploracion');
+  
+  // Función para obtener recompensa de un brazo
+  function jugarBrazo(brazoIndex) {
+    const brazo = brazos[brazoIndex];
+    // Generar recompensa aleatoria basada en la distribución normal
+    let recompensa;
+    do {
+      recompensa = brazo.media + (Math.random() - 0.5) * brazo.varianza * 2;
+    } while (recompensa < 0 || recompensa > 1); // Asegurar que está entre 0 y 1
+    
+    return recompensa;
+  }
+  
+  // Función para elegir brazo según política ε-greedy
+  function elegirBrazo() {
+    const epsilon = parseFloat(exploracionInput.value);
+    
+    // Exploración (probabilidad ε)
+    if (Math.random() < epsilon) {
+      return Math.floor(Math.random() * 3);
+    }
+    // Explotación (probabilidad 1-ε)
+    else {
+      return qValues.indexOf(Math.max(...qValues));
+    }
+  }
+  
+  // Función para actualizar los valores Q
+  function actualizarQ(brazoIndex, recompensa) {
+    const alpha = parseFloat(tasaAprendizajeInput.value);
+    qValues[brazoIndex] = qValues[brazoIndex] + alpha * (recompensa - qValues[brazoIndex]);
+  }
+  
+  // Función para jugar una ronda
+  function jugarRonda() {
+    const brazoIndex = elegirBrazo();
+    const recompensa = jugarBrazo(brazoIndex);
+    
+    // Actualizar estadísticas
+    counts[brazoIndex]++;
+    totalJugadas++;
+    recompensaTotal += recompensa;
+    
+    // Actualizar valor Q
+    actualizarQ(brazoIndex, recompensa);
+    
+    // Actualizar UI
+    actualizarUI(brazoIndex, recompensa);
+  }
+  
+  // Función para actualizar la interfaz
+  function actualizarUI(brazoIndex, recompensa) {
+    // Destacar brazo jugado
+    elementosBrazos.forEach((brazo, i) => {
+      brazo.classList.remove('jugado', 'mejor');
+      if (i === brazoIndex) brazo.classList.add('jugado');
+      if (i === qValues.indexOf(Math.max(...qValues))) brazo.classList.add('mejor');
+    });
+    
+    // Actualizar recompensas promedio
+    elementosBrazos.forEach((brazo, i) => {
+      brazo.querySelector('.recompensa-promedio').textContent = 
+        `Valor: ${qValues[i].toFixed(2)} (${counts[i]}x)`;
+    });
+    
+    // Actualizar estadísticas
+    document.getElementById('total-jugadas').textContent = totalJugadas;
+    document.getElementById('recompensa-total').textContent = recompensaTotal.toFixed(2);
+    document.getElementById('brazo-preferido').textContent = 
+      qValues.indexOf(Math.max(...qValues)) + 1;
+  }
+  
+  // Función para reiniciar el simulador
+  function reiniciar() {
+    qValues = [0, 0, 0];
+    counts = [0, 0, 0];
+    totalJugadas = 0;
+    recompensaTotal = 0;
+    
+    elementosBrazos.forEach(brazo => {
+      brazo.classList.remove('jugado', 'mejor');
+      brazo.querySelector('.recompensa-promedio').textContent = 'Valor: ?';
+    });
+    
+    document.getElementById('total-jugadas').textContent = '0';
+    document.getElementById('recompensa-total').textContent = '0';
+    document.getElementById('brazo-preferido').textContent = 'Ninguno';
+  }
+  
+  // Event listeners
+  botonJugar.addEventListener('click', () => {
+    for (let i = 0; i < 10; i++) {
+      setTimeout(jugarRonda, i * 300);
+    }
+  });
+  
+  botonReiniciar.addEventListener('click', reiniciar);
+  
+  // Actualizar valores de los sliders
+  tasaAprendizajeInput.addEventListener('input', () => {
+    document.getElementById('valor-tasa').textContent = tasaAprendizajeInput.value;
+  });
+  
+  exploracionInput.addEventListener('input', () => {
+    document.getElementById('valor-exploracion').textContent = exploracionInput.value;
+  });
+</script>
+    </section>
+
+    <section id="comparativa">
+  <h2>Comparativa y Conclusiones</h2>
+
+  <h3>Ventajas y desventajas de los árboles de decisión</h3>
+
+  <h4>Ventajas:</h4>
+  <ul>
+    <li><strong>Fáciles de entender e interpretar:</strong> Gracias a su estructura jerárquica, es sencillo seguir el razonamiento del modelo y ver qué atributos son más importantes.</li>
+    <li><strong>Requieren poca preparación de datos:</strong> Funcionan bien con datos numéricos y categóricos, e incluso pueden manejar valores faltantes.</li>
+    <li><strong>Versátiles:</strong> Se pueden usar tanto para clasificación como para regresión, y no necesitan que los atributos estén relacionados entre sí.</li>
+  </ul>
+
+  <h4>Desventajas:</h4>
+  <ul>
+    <li><strong>Pueden sobreajustarse:</strong> Si el árbol es muy grande, puede ajustarse demasiado a los datos de entrenamiento y fallar con datos nuevos.</li>
+    <li><strong>Sensibles a pequeños cambios:</strong> Una mínima modificación en los datos puede generar un árbol completamente diferente.</li>
+    <li><strong>Entrenamiento costoso:</strong> Aunque son fáciles de usar, construir el árbol puede ser más lento que otros algoritmos, debido a su enfoque de búsqueda exhaustiva.</li>
+  </ul>
+
+  <h3>Ventajas y desventajas del Reinforcement Learning</h3>
+
+  <h4>Ventajas:</h4>
+  <ul>
+    <li><strong>Aprendizaje autónomo:</strong> Los sistemas pueden aprender por sí mismos mediante la interacción con el entorno, sin necesidad de grandes conjuntos de datos etiquetados.</li>
+    <li><strong>Excelente para problemas secuenciales:</strong> Es ideal para tareas donde las decisiones afectan estados futuros, como en juegos, robótica o sistemas de control.</li>
+    <li><strong>Adaptabilidad continua:</strong> Pueden mejorar su desempeño con el tiempo mientras interactúan con entornos dinámicos o cambiantes.</li>
+    <li><strong>Balance exploración-explotación:</strong> La política ε-greedy y otros métodos permiten encontrar un equilibrio entre probar nuevas acciones y aprovechar lo aprendido.</li>
+  </ul>
+
+  <h4>Desventajas:</h4>
+  <ul>
+    <li><strong>Alto costo computacional:</strong> Requieren muchas interacciones con el entorno para converger a una buena política, lo que puede ser lento y costoso.</li>
+    <li><strong>Dificultad en el diseño de recompensas:</strong> Definir un sistema de recompensas adecuado es crucial y puede ser complejo (problema de "reward shaping").</li>
+    <li><strong>Inestabilidad durante el entrenamiento:</strong> Los algoritmos pueden ser sensibles a la configuración de hiperparámetros como la tasa de aprendizaje o el factor de descuento.</li>
+    <li><strong>Problema de exploración:</strong> En entornos complejos, puede ser difícil explorar suficientes estados para aprender políticas óptimas.</li>
+  </ul>
+
+  <h3>Comparación final</h3>
+  <p>
+    Mientras los <strong>árboles de decisión</strong> son ideales para problemas estáticos con datos estructurados donde la interpretabilidad es importante, el <strong>Reinforcement Learning</strong> brilla en escenarios dinámicos que requieren toma de decisiones secuenciales y adaptación continua. La elección entre uno u otro dependerá de la naturaleza del problema, los recursos disponibles y si el entorno permite la interacción para el aprendizaje.
+  </p>
+  
+  <table class="tabla-comparativa">
+    <thead>
+      <tr>
+        <th>Criterio</th>
+        <th>Árboles de Decisión</th>
+        <th>Reinforcement Learning</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>Mejor para</td>
+        <td>Datos estructurados, problemas estáticos</td>
+        <td>Entornos dinámicos, decisiones secuenciales</td>
+      </tr>
+      <tr>
+        <td>Interpretabilidad</td>
+        <td>Alta (estructura visible)</td>
+        <td>Baja (policy como "caja negra")</td>
+      </tr>
+      <tr>
+        <td>Preparación de datos</td>
+        <td>Mínima</td>
+        <td>Requiere diseño de entorno/recompensas</td>
+      </tr>
+      <tr>
+        <td>Costo computacional</td>
+        <td>Moderado (entrenamiento)</td>
+        <td>Alto (muchas interacciones necesarias)</td>
+      </tr>
+      <tr>
+        <td>Adaptabilidad</td>
+        <td>Baja (requiere reentrenar)</td>
+        <td>Alta (aprende continuamente)</td>
+      </tr>
+    </tbody>
+  </table>
+</section>
+
+
+
+  </div>
+
+<section id="referencias">
+  <h2>Referencias</h2>
+  <ul class="lista-referencias">
+    <li>[1] IBM Cloud Education. <a href="https://www.ibm.com/es-es/think/topics/decision-trees" target="_blank" rel="noopener noreferrer">"Árboles de Decisión"</a>. IBM. Consultado en 2025.</li>
+    <li>[2] IBM Cloud Education. <a href="https://www.ibm.com/es-es/think/topics/reinforcement-learning" target="_blank" rel="noopener noreferrer">"Reinforcement Learning"</a>. IBM. Consultado en 2025.</li>
+  </ul>
+</section>
+
+</body>
+</html>
